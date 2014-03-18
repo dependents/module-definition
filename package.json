@@ -1,24 +1,19 @@
 {
-  "name": "node-detect-module-format",
-  "version": "0.0.0",
-  "description": "Determines if a file is using the CommonJS or AMD module formats",
+  "name": "module-definition",
+  "version": "1.0.0",
+  "description": "Determines if a file is using a CommonJS or AMD module definition",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrjoelkemp/node-detect-module-format"
+    "url": "https://github.com/mrjoelkemp/module-definition"
   },
   "author": "Joel Kemp <joel@mrjoelkemp.com> (http://www.mrjoelkemp.com/)",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mrjoelkemp/node-detect-module-format/issues"
-  },
-  "homepage": "https://github.com/mrjoelkemp/node-detect-module-format",
+  "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
-    "detective": "^3.0.0",
-    "q": "^1.0.1",
     "esprima": "^1.0.4"
   }
 }

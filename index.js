@@ -1,5 +1,4 @@
 var esprima = require('esprima'),
-    q  = require('q'),
     fs = require('fs');
 
 // From node-detective
@@ -48,9 +47,7 @@ function isDefine(node) {
     c.name    === 'define';
 }
 
-module.exports = function (file) {
-  var deferred = q.defer();
-
+module.exports = function (file, cb) {
   if (! file) throw new Error('filename missing');
 
   // Read file
@@ -83,8 +80,6 @@ module.exports = function (file) {
       }
     });
 
-    deferred.resolve(type);
+    cb(type);
   });
-
-  return deferred.promise;
 };
