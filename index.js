@@ -61,10 +61,6 @@ module.exports = function (file, cb) {
         type = 'none',
         alreadyDeduced = false;
 
-    // Clean the source code of unnecessary
-    // TODO: Wtf is this stripping?
-    src = src.replace(/^#![^\n]*\n/, '');
-
     // Note: this is blocking
     walk(src, function (node) {
       if (alreadyDeduced) return;
