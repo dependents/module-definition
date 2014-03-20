@@ -17,6 +17,59 @@ function isDefine(node) {
     c.name    === 'define';
 }
 
+// Whether or not the node represents a require function call
+function isRequire(node) {
+  var c = node.callee;
+
+  return c &&
+        node.type  === 'CallExpression' &&
+        c.type     === 'Identifier' &&
+        c.name     === 'require';
+}
+
+function isCommonJS(node) {
+
+  return isExports(node) ||
+        // there's a require with no define
+        (hasRequire(node) && ! hasDefine(node));
+}
+
+// Whether or not the node has a require call
+// somewhere in its ast
+function hasRequire(node) {
+  var sawRequire = false;
+
+  var walker = new Walker();
+  walker.traverse(node, function (node) {
+    if (isRequire(node)) {
+      sawRequire = true;
+      walker.stopWalking();
+    }
+  });
+
+  return sawRequire;
+}
+
+// Whether or not the node has a define call
+// somewhere in its ast
+function hasDefine(node) {
+  var sawDefine = false;
+
+  var walker = new Walker();
+  walker.traverse(node, function (node) {
+    if (isDefine(node)) {
+      sawDefine = true;
+      walker.stopWalking();
+    }
+  });
+
+  return sawDefine;
+}
+
+function isAMD(node) {
+  return isDefine(node);
+}
+
 module.exports = function (file, cb) {
   if (! file) throw new Error('filename missing');
 
@@ -34,11 +87,11 @@ module.exports = function (file, cb) {
 
     // Note: this is blocking
     walker.walk(src, function (node) {
-      if (isExports(node)) {
+      if (isCommonJS(node)) {
         type = 'commonjs';
         walker.stopWalking();
 
-      } else if (isDefine(node)) {
+      } else if (isAMD(node)) {
         type = 'amd';
         walker.stopWalking();
       }
