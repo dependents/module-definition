@@ -1,35 +1,10 @@
-var Walker = require('node-source-walk'),
-    fs = require('fs');
-
-function isExports(node) {
-  var c = node.object;
-  return c &&
-    node.type === 'MemberExpression' &&
-    c.type    === 'Identifier' &&
-    (c.name   === 'module' || c.name === 'exports');
-}
-
-function isDefine(node) {
-  var c = node.callee;
-  return c &&
-    node.type === 'CallExpression' &&
-    c.type    === 'Identifier' &&
-    c.name    === 'define';
-}
-
-// Whether or not the node represents a require function call
-function isRequire(node) {
-  var c = node.callee;
-
-  return c &&
-        node.type  === 'CallExpression' &&
-        c.type     === 'Identifier' &&
-        c.name     === 'require';
-}
+var Walker  = require('node-source-walk'),
+    types   = require('ast-module-types'),
+    fs      = require('fs');
 
 function isCommonJS(node) {
 
-  return isExports(node) ||
+  return types.isExports(node) ||
         // there's a require with no define
         (hasRequire(node) && ! hasDefine(node));
 }
@@ -41,7 +16,7 @@ function hasRequire(node) {
 
   var walker = new Walker();
   walker.traverse(node, function (node) {
-    if (isRequire(node)) {
+    if (types.isRequire(node)) {
       sawRequire = true;
       walker.stopWalking();
     }
@@ -57,7 +32,7 @@ function hasDefine(node) {
 
   var walker = new Walker();
   walker.traverse(node, function (node) {
-    if (isDefine(node)) {
+    if (types.isDefine(node)) {
       sawDefine = true;
       walker.stopWalking();
     }
@@ -67,7 +42,7 @@ function hasDefine(node) {
 }
 
 function isAMD(node) {
-  return isDefine(node);
+  return types.isDefine(node);
 }
 
 module.exports = function (file, cb) {
