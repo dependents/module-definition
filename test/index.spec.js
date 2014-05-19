@@ -10,6 +10,13 @@ function asyncTest(filename, result) {
     });
 }
 
+function syncTest(filename, result) {
+    it("should return `" + result + "` as type of " + filename, function() {
+        var type = getModuleType.sync(path.resolve(__dirname, filename));
+        expect(type).toBe(result);
+    });
+}
+
 describe("Async tests", function() {
     beforeEach(function(done) {
         this.originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
@@ -26,4 +33,12 @@ describe("Async tests", function() {
     afterEach(function() {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = this.originalTimeout;
     });
+});
+
+describe("Sync tests", function() {
+    syncTest("./a.js", "commonjs");
+    syncTest("./b.js", "commonjs");
+    syncTest("./c.js", "amd");
+    syncTest("./d.js", "none");
+    syncTest("./e.js", "amd");
 });
