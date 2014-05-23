@@ -1,5 +1,6 @@
 var getModuleType = require('../');
 var path = require("path");
+var fs = require("fs");
 
 function asyncTest(filename, result) {
     it("should return `" + result + "` as type of " + filename, function(done) {
@@ -13,6 +14,14 @@ function asyncTest(filename, result) {
 function syncTest(filename, result) {
     it("should return `" + result + "` as type of " + filename, function() {
         var type = getModuleType.sync(path.resolve(__dirname, filename));
+        expect(type).toBe(result);
+    });
+}
+
+function sourceTest(filename, result) {
+    it("should return `" + result + "` as type of " + filename, function() {
+        var source = fs.readFileSync(path.resolve(__dirname, filename));
+        var type = getModuleType.fromSource(source);
         expect(type).toBe(result);
     });
 }
@@ -41,4 +50,12 @@ describe("Sync tests", function() {
     syncTest("./c.js", "amd");
     syncTest("./d.js", "none");
     syncTest("./e.js", "amd");
+});
+
+describe("From source tests", function() {
+    sourceTest("./a.js", "commonjs");
+    sourceTest("./b.js", "commonjs");
+    sourceTest("./c.js", "amd");
+    sourceTest("./d.js", "none");
+    sourceTest("./e.js", "amd");
 });
