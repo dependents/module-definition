@@ -45,6 +45,31 @@ function isAMD(node) {
   return types.isDefine(node);
 }
 
+function fromSource(source) {
+  var type = 'none';
+  var walker = new Walker();
+
+  walker.walk(source, function (node) {
+    if (isCommonJS(node)) {
+      type = 'commonjs';
+      walker.stopWalking();
+
+    } else if (isAMD(node)) {
+      type = 'amd';
+      walker.stopWalking();
+    }
+  });
+
+  return type;
+}
+
+function sync(file) {
+  if (! file) throw new Error('filename missing');
+
+  var data = fs.readFileSync(file);
+  return fromSource(data.toString());
+}
+
 module.exports = function (file, cb) {
   if (! file) throw new Error('filename missing');
 
@@ -57,21 +82,13 @@ module.exports = function (file, cb) {
       return;
     }
 
-    var src = data.toString(),
-        type = 'none';
-
-    // Note: this is blocking
-    walker.walk(src, function (node) {
-      if (isCommonJS(node)) {
-        type = 'commonjs';
-        walker.stopWalking();
-
-      } else if (isAMD(node)) {
-        type = 'amd';
-        walker.stopWalking();
-      }
-    });
+    var src = data.toString();
+    var type = fromSource(data.toString());
 
     cb && cb(type);
   });
 };
+
+
+module.exports.sync = sync;
+module.exports.fromSource = fromSource;

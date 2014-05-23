@@ -4,7 +4,7 @@
   "description": "Determines if a file is using a CommonJS or AMD module definition",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine-node --verbose test"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "dependencies": {
     "node-source-walk": "^1.1.0",
     "ast-module-types": "^1.0.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "2.x.x"
   }
 }
