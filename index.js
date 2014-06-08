@@ -2,104 +2,57 @@ var Walker  = require('node-source-walk'),
     types   = require('ast-module-types'),
     fs      = require('fs');
 
-function hasRequire(ast) {
-  var sawRequire = false;
+// Allows us to differentiate from the funky commonjs case
+function hasAMDArguments(requireNode) {
+  var args = requireNode.arguments;
 
-  var walker = new Walker();
-  walker.traverse(ast, function (node) {
-    if (types.isRequire(node)) {
-      sawRequire = true;
-      walker.stopWalking();
-    }
-  });
-
-  return sawRequire;
-}
-
-function hasDefine(ast) {
-  var sawDefine = false;
-
-  var walker = new Walker();
-  walker.traverse(ast, function (node) {
-    if (types.isDefine(node)) {
-      sawDefine = true;
-      walker.stopWalking();
-    }
-  });
-
-  return sawDefine;
-}
-
-function hasAMDTopLevelRequire(ast) {
-  var result = false,
-      walker = new Walker(),
-      // Allows us to differentiate from the funky commonjs case
-      hasValidArguments = function(requireNode) {
-        var args = requireNode.arguments;
-
-        return  args &&
-                args[0].type !== 'Literal' &&
-                // For some dynamic node requires
-                args[0].type !== 'Identifier';
-      };
-
-  walker.traverse(ast, function(node) {
-    if (types.isTopLevelRequire(node) && hasValidArguments(node)) {
-      result = true;
-      walker.stopWalking();
-    }
-  });
-
-  return result;
-}
-
-function hasExports(ast) {
-  var result = false,
-      walker = new Walker();
-
-  walker.traverse(ast, function(node) {
-    if (types.isExports(node)) {
-      result = true;
-      walker.stopWalking();
-    }
-  });
-
-  return result;
-}
-
-function isAMD(ast) {
-  return  hasDefine(ast) ||
-          hasAMDTopLevelRequire(ast);
-}
-
-function isCommonJS(ast) {
-  return  hasExports(ast) ||
-          // there's a require with no define
-          hasRequire(ast) && ! hasDefine(ast);
+  return  args &&
+          args[0].type !== 'Literal' &&
+          // For some dynamic node requires
+          args[0].type !== 'Identifier';
 }
 
 function fromSource(source) {
   if (! source) throw new Error('source not supplied');
 
-  var type = 'none';
-  var walker = new Walker();
+  var type = 'none',
+      walker = new Walker(),
+      hasDefine = false,
+      hasAMDTopLevelRequire = false,
+      hasRequire = false,
+      hasExports = false,
+      isAMD, isCommonJS;
 
-  walker.walk(source, function (ast) {
-    // Check for amd first because it's a simpler traversal
-    // Also, there's a funky case when a top-level require could be an amd driver script
-    // or a commonjs module that starts with require('something'). It's easier to check
-    // for the AMD driver script case
-    if (isAMD(ast)) {
-      type = 'amd';
-      walker.stopWalking();
+  walker.walk(source, function (node) {
+    if (types.isDefine(node)) {
+      hasDefine = true;
+    }
 
-    } else if (isCommonJS(ast)) {
-      type = 'commonjs';
-      walker.stopWalking();
+    if (types.isRequire(node)) {
+      hasRequire = true;
+    }
+
+    if (types.isExports(node)) {
+      hasExports = true;
+    }
+
+    if (types.isTopLevelRequire(node) && hasAMDArguments(node)) {
+      hasAMDTopLevelRequire = true;
     }
   });
 
-  return type;
+  isAMD = hasDefine || hasAMDTopLevelRequire;
+  isCommonJS = hasExports || (hasRequire && ! hasDefine);
+
+  if (isAMD) {
+    return 'amd';
+  }
+
+  if(isCommonJS) {
+    return'commonjs';
+  }
+
+  return 'none';
 }
 
 function sync(file) {
