@@ -1,3 +1,5 @@
+# module-definition [![npm](http://img.shields.io/npm/v/module-definition.svg)](https://npmjs.org/package/module-definition) [![npm](http://img.shields.io/npm/dm/module-definition.svg)](https://npmjs.org/package/module-definition)
+
 Determines the module definition type (CommonJS, AMD, or none) for a given JavaScript file
 by walking through the AST.
 
