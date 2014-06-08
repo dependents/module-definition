@@ -13,7 +13,7 @@ function hasAMDArguments(requireNode) {
 }
 
 function fromSource(source) {
-  if (! source) throw new Error('source not supplied');
+  if (typeof source === 'undefined') throw new Error('source not supplied');
 
   var type = 'none',
       walker = new Walker(),
