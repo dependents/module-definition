@@ -14,8 +14,8 @@
   "license": "MIT",
   "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
-    "node-source-walk": "^1.1.0",
-    "ast-module-types": "^1.0.0"
+    "ast-module-types": "^1.1.1",
+    "node-source-walk": "^1.1.0"
   },
   "devDependencies": {
     "jasmine-node": "2.x.x"

@@ -38,6 +38,16 @@ describe("Async tests", function() {
     asyncTest("./c.js", "amd");
     asyncTest("./d.js", "none");
     asyncTest("./e.js", "amd");
+    asyncTest("./f.js", "amd");
+    asyncTest("./g.js", "commonjs");
+
+    it('throws if the filename is not supplied', function() {
+        expect(function () { getModuleType(); } ).toThrow();
+    });
+
+    it('throws if a callback is not supplied', function() {
+        expect(function () { getModuleType('./a.js'); } ).toThrow();
+    });
 
     afterEach(function() {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = this.originalTimeout;
@@ -50,6 +60,12 @@ describe("Sync tests", function() {
     syncTest("./c.js", "amd");
     syncTest("./d.js", "none");
     syncTest("./e.js", "amd");
+    syncTest("./f.js", "amd");
+    syncTest("./g.js", "commonjs");
+
+    it('throws if the filename is not supplied', function() {
+        expect(function () { getModuleType.sync(); } ).toThrow();
+    });
 });
 
 describe("From source tests", function() {
@@ -58,4 +74,10 @@ describe("From source tests", function() {
     sourceTest("./c.js", "amd");
     sourceTest("./d.js", "none");
     sourceTest("./e.js", "amd");
+    sourceTest("./f.js", "amd");
+    sourceTest("./g.js", "commonjs");
+
+    it('throws if source code is not supplied', function() {
+        expect(function () { getModuleType.fromSource(); } ).toThrow();
+    });
 });
