@@ -2,16 +2,6 @@ var Walker  = require('node-source-walk'),
     types   = require('ast-module-types'),
     fs      = require('fs');
 
-// Allows us to differentiate from the funky commonjs case
-function hasAMDArguments(requireNode) {
-  var args = requireNode.arguments;
-
-  return  args &&
-          args[0].type !== 'Literal' &&
-          // For some dynamic node requires
-          args[0].type !== 'Identifier';
-}
-
 function fromSource(source) {
   if (typeof source === 'undefined') throw new Error('source not supplied');
 
@@ -36,7 +26,7 @@ function fromSource(source) {
       hasExports = true;
     }
 
-    if (types.isTopLevelRequire(node) && hasAMDArguments(node)) {
+    if (types.isAMDDriverScriptRequire(node)) {
       hasAMDTopLevelRequire = true;
     }
   });

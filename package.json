@@ -17,7 +17,7 @@
   "license": "MIT",
   "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
-    "ast-module-types": "^1.1.1",
+    "ast-module-types": "^1.2.0",
     "node-source-walk": "^1.1.0"
   },
   "devDependencies": {
