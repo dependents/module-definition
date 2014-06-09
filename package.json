@@ -3,6 +3,9 @@
   "version": "1.2.2",
   "description": "Determines if a file is using a CommonJS or AMD module definition",
   "main": "index.js",
+  "bin": {
+    "module-definition": "bin/module-definition.js"
+  },
   "scripts": {
     "test": "jasmine-node --verbose test"
   },

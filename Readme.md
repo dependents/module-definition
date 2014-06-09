@@ -24,6 +24,11 @@ var type = getModuleType.fromSource('define({foo: "foo"});');
 console.log(type);
 ```
 
+Or via shell command (requires a global install: `npm install -g module-definition`)
+```
+module-definition filename
+```
+
 Passes one of the following strings to the given callback or returns the string in sync api:
 
 * amd
