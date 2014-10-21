@@ -41,6 +41,7 @@ describe("Async tests", function() {
     asyncTest("./f.js", "amd");
     asyncTest("./g.js", "commonjs");
     asyncTest("./h.js", "none");
+    asyncTest("./i.js", "amd");
 
     it('throws if the filename is not supplied', function() {
         expect(function () { getModuleType(); } ).toThrow();
@@ -64,6 +65,7 @@ describe("Sync tests", function() {
     syncTest("./f.js", "amd");
     syncTest("./g.js", "commonjs");
     syncTest("./h.js", "none");
+    syncTest("./i.js", "amd");
 
     it('throws if the filename is not supplied', function() {
         expect(function () { getModuleType.sync(); } ).toThrow();
@@ -79,6 +81,7 @@ describe("From source tests", function() {
     sourceTest("./f.js", "amd");
     sourceTest("./g.js", "commonjs");
     sourceTest("./h.js", "none");
+    sourceTest("./i.js", "amd");
 
     it('throws if source code is not supplied', function() {
         expect(function () { getModuleType.fromSource(); } ).toThrow();
