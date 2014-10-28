@@ -11,6 +11,7 @@ function fromSource(source) {
       hasAMDTopLevelRequire = false,
       hasRequire = false,
       hasExports = false,
+      hasES6Import = false,
       isAMD, isCommonJS;
 
   walker.walk(source, function (node) {
@@ -29,17 +30,28 @@ function fromSource(source) {
     if (types.isAMDDriverScriptRequire(node)) {
       hasAMDTopLevelRequire = true;
     }
+
+    // @todo: Support es6-style exports
+    if (types.isES6Import(node)) {
+      hasES6Import = true;
+    }
   });
 
   isAMD = hasDefine || hasAMDTopLevelRequire;
   isCommonJS = hasExports || (hasRequire && ! hasDefine);
+  // @todo: Support hasES6Exports
+  isES6 = hasES6Import;
 
   if (isAMD) {
     return 'amd';
   }
 
-  if(isCommonJS) {
-    return'commonjs';
+  if (isCommonJS) {
+    return 'commonjs';
+  }
+
+  if (isES6) {
+    return 'es6';
   }
 
   return 'none';
