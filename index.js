@@ -70,16 +70,18 @@ module.exports = function (file, cb) {
 
   var walker = new Walker();
 
-  fs.readFile(file, function (err, data) {
+  fs.readFile(file, { encoding: "utf8" }, function (err, data) {
     if (err) {
-      console.log(err);
-      return;
+      return cb(err);
     }
 
-    var src = data.toString(),
-        type = fromSource(data.toString());
+    try {
+      var type = fromSource(data);
+    } catch(err) {
+      return cb(err)
+    }
 
-    if (cb) cb(type);
+    cb(null, type);
   });
 };
 
