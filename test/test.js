@@ -23,7 +23,8 @@ function testMethodAgainstExpected(method) {
 
 function asyncTest(filename, result) {
     it('should return `' + result + '` as type of ' + filename, function(done) {
-        getModuleType(path.resolve(__dirname, filename), function (type) {
+        getModuleType(path.resolve(__dirname, filename), function (error, type) {
+            assert(error === null);
             assert(type === result);
             done();
         });
@@ -47,6 +48,20 @@ function sourceTest(filename, result) {
 
 describe('Async tests', function() {
     testMethodAgainstExpected(asyncTest);
+
+    it('should report an error for non-existing file', function(done) {
+        getModuleType("no_such_file", function (error, type) {
+            assert(error !== null);
+            done();
+        });
+    });
+
+    it('should report an error for file with syntax error', function(done) {
+        getModuleType(path.resolve(__dirname, 'j.js'), function (error, type) {
+            assert(error !== null);
+            done();
+        });
+    });
 });
 
 describe('Sync tests', function() {

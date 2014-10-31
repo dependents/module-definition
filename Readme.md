@@ -11,7 +11,7 @@ by walking through the AST.
 var getModuleType = require('module-definition');
 
 // Async
-getModuleType('myscript.js', function (type) {
+getModuleType('myscript.js', function (err, type) {
   console.log(type);
 });
 
