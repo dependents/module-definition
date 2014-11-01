@@ -24,8 +24,8 @@ function testMethodAgainstExpected(method) {
 function asyncTest(filename, result) {
     it('should return `' + result + '` as type of ' + filename, function(done) {
         getModuleType(path.resolve(__dirname, filename), function (error, type) {
-            assert(error === null);
-            assert(type === result);
+            assert.strictEqual(error, null, error);
+            assert.equal(type, result);
             done();
         });
     });
@@ -34,7 +34,7 @@ function asyncTest(filename, result) {
 function syncTest(filename, result) {
     it("should return `" + result + "` as type of " + filename, function() {
         var type = getModuleType.sync(path.resolve(__dirname, filename));
-        assert(type === result);
+        assert.equal(type, result);
     });
 }
 
@@ -42,7 +42,7 @@ function sourceTest(filename, result) {
     it('should return `' + result + '` as type of ' + filename, function() {
         var source = fs.readFileSync(path.resolve(__dirname, filename));
         var type = getModuleType.fromSource(source);
-        assert(type === result);
+        assert.equal(type, result);
     });
 }
 
@@ -51,14 +51,18 @@ describe('Async tests', function() {
 
     it('should report an error for non-existing file', function(done) {
         getModuleType("no_such_file", function (error, type) {
-            assert(error !== null);
+            assert.notStrictEqual(error, null);
+            // ENOENT errors always contains filename
+            assert.notEqual(error.toString().indexOf("no_such_file"), -1, error);
             done();
         });
     });
 
     it('should report an error for file with syntax error', function(done) {
         getModuleType(path.resolve(__dirname, 'j.js'), function (error, type) {
-            assert(error !== null);
+            assert.notStrictEqual(error, null);
+            // Check error not to be ENOENT
+            assert.equal(error.toString().indexOf("j.js"), -1, error);
             done();
         });
     });
