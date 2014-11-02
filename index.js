@@ -65,8 +65,13 @@ function sync(file) {
 }
 
 module.exports = function (file, cb) {
-  if (! file) throw new Error('filename missing');
-  if (! cb)   throw new Error('callback missing');
+  if (! file) {
+    return cb(new Error('filename missing'));
+  }
+
+  if (! cb) {
+    return cb(new Error('callback missing'));
+  }
 
   var walker = new Walker();
 
@@ -75,8 +80,10 @@ module.exports = function (file, cb) {
       return cb(err);
     }
 
+    var type;
+
     try {
-      var type = fromSource(data);
+      type = fromSource(data);
     } catch(err) {
       return cb(err)
     }
