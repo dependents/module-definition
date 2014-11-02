@@ -2,6 +2,12 @@ var Walker  = require('node-source-walk'),
     types   = require('ast-module-types'),
     fs      = require('fs');
 
+/**
+ * Determines the type of the module from the supplied source code
+ *
+ * @param  {String} source
+ * @return {String}
+ */
 function fromSource(source) {
   if (typeof source === 'undefined') throw new Error('source not supplied');
 
@@ -57,6 +63,12 @@ function fromSource(source) {
   return 'none';
 }
 
+/**
+ * Synchronously determine the module type for the contents of the passed filepath
+ *
+ * @param  {String} file
+ * @return {String}
+ */
 function sync(file) {
   if (! file) throw new Error('filename missing');
 
@@ -64,21 +76,34 @@ function sync(file) {
   return fromSource(data.toString());
 }
 
-module.exports = function (file, cb) {
-  if (! file) throw new Error('filename missing');
-  if (! cb)   throw new Error('callback missing');
+/**
+ * Asynchronously determines the module type for the contents of the given filepath
+ *
+ * @param  {String}   filepath
+ * @param  {Function} cb - Executed with (err, type)
+ */
+module.exports = function (filepath, cb) {
+  if (! filepath) {
+    return cb(new Error('filename missing'));
+  }
+
+  if (! cb) {
+    return cb(new Error('callback missing'));
+  }
 
   var walker = new Walker();
 
-  fs.readFile(file, { encoding: "utf8" }, function (err, data) {
+  fs.readFile(filepath, { encoding: 'utf8' }, function (err, data) {
     if (err) {
       return cb(err);
     }
 
+    var type;
+
     try {
-      var type = fromSource(data);
-    } catch(err) {
-      return cb(err)
+      type = fromSource(data);
+    } catch(error) {
+      return cb(error);
     }
 
     cb(null, type);
