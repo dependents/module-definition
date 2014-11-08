@@ -84,11 +84,11 @@ function sync(file) {
  */
 module.exports = function (filepath, cb) {
   if (! filepath) {
-    return cb(new Error('filename missing'));
+    throw new Error('filename missing');
   }
 
   if (! cb) {
-    return cb(new Error('callback missing'));
+    throw new Error('callback missing');
   }
 
   var walker = new Walker();

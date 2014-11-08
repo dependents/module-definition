@@ -66,12 +66,33 @@ describe('Async tests', function() {
             done();
         });
     });
+
+    it("should throw an error if argument is missing", function() {
+        assert.throws(function() {
+            getModuleType(path.resolve(__dirname, 'a.js'));
+        }, /callback/);
+        assert.throws(function() {
+            getModuleType();
+        }, /filename/);
+    });
 });
 
 describe('Sync tests', function() {
     testMethodAgainstExpected(syncTest);
+
+    it("should throw an error if argument is missing", function() {
+        assert.throws(function() {
+            getModuleType.sync();
+        }, /filename/);
+    });
 });
 
 describe('From source tests', function() {
     testMethodAgainstExpected(sourceTest);
+
+    it("should throw an error if argument is missing", function() {
+        assert.throws(function() {
+            getModuleType.fromSource();
+        }, /source/);
+    });
 });
