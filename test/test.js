@@ -12,7 +12,9 @@ var expected = {
     './f.js': 'amd',
     './g.js': 'commonjs',
     './h.js': 'none',
-    './i.js': 'amd'
+    './i.js': 'amd',
+    './es6Import.js': 'es6',
+    './es6Export.js': 'es6'
 };
 
 function testMethodAgainstExpected(method) {

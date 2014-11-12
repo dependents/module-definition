@@ -11,14 +11,16 @@ var Walker  = require('node-source-walk'),
 function fromSource(source) {
   if (typeof source === 'undefined') throw new Error('source not supplied');
 
-  var type = 'none',
-      walker = new Walker(),
+  var walker = new Walker({
+        esprimaHarmony: true
+      }),
       hasDefine = false,
       hasAMDTopLevelRequire = false,
       hasRequire = false,
       hasExports = false,
       hasES6Import = false,
-      isAMD, isCommonJS;
+      hasES6Export = false,
+      isAMD, isCommonJS, isES6;
 
   walker.walk(source, function (node) {
     if (types.isDefine(node)) {
@@ -37,16 +39,18 @@ function fromSource(source) {
       hasAMDTopLevelRequire = true;
     }
 
-    // @todo: Support es6-style exports
     if (types.isES6Import(node)) {
       hasES6Import = true;
+    }
+
+    if(types.isES6Export(node)) {
+      hasES6Export = true;
     }
   });
 
   isAMD = hasDefine || hasAMDTopLevelRequire;
   isCommonJS = hasExports || (hasRequire && ! hasDefine);
-  // @todo: Support hasES6Exports
-  isES6 = hasES6Import;
+  isES6 = hasES6Import || hasES6Export;
 
   if (isAMD) {
     return 'amd';
@@ -90,8 +94,6 @@ module.exports = function (filepath, cb) {
   if (! cb) {
     throw new Error('callback missing');
   }
-
-  var walker = new Walker();
 
   fs.readFile(filepath, { encoding: 'utf8' }, function (err, data) {
     if (err) {
