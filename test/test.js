@@ -4,15 +4,15 @@ var fs = require('fs');
 var assert = require('assert');
 
 var expected = {
-    './a.js': 'commonjs',
-    './b.js': 'commonjs',
-    './c.js': 'amd',
-    './d.js': 'none',
-    './e.js': 'amd',
-    './f.js': 'amd',
-    './g.js': 'commonjs',
-    './h.js': 'none',
-    './i.js': 'amd',
+    './cjsExport.js': 'commonjs',
+    './cjsRequire.js': 'commonjs',
+    './amdNoDep.js': 'amd',
+    './iife.js': 'none',
+    './amdFactory.js': 'amd',
+    './amdDeps.js': 'amd',
+    './cjsTopRequire.js': 'commonjs',
+    './empty.js': 'none',
+    './amdREM.js': 'amd',
     './es6Import.js': 'es6',
     './es6Export.js': 'es6'
 };

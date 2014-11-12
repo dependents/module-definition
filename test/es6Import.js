@@ -1,2 +1,2 @@
 import {foo, bar} from "mylib";
-import "mylib2"
+import "mylib2";
