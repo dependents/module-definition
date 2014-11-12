@@ -7,7 +7,7 @@
     "module-definition": "bin/module-definition.js"
   },
   "scripts": {
-    "test": "mocha test/test.js"
+    "test": "jscs test/test.js index.js bin/module-definition.js -p airbnb && mocha test/test.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "node-source-walk": "~1.2.0"
   },
   "devDependencies": {
+    "jscs": "~1.7.3",
     "mocha": "~2.0.1"
   }
 }
