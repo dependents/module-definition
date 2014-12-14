@@ -18,7 +18,7 @@
   "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
     "ast-module-types": "~2.2.1",
-    "node-source-walk": "~1.2.0"
+    "node-source-walk": "~1.4.0"
   },
   "devDependencies": {
     "jscs": "~1.7.3",
