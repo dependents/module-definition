@@ -7,7 +7,7 @@
     "module-definition": "bin/module-definition.js"
   },
   "scripts": {
-    "test": "jscs test/test.js index.js bin/module-definition.js -p airbnb && mocha test/test.js"
+    "test": "jscs test/test.js index.js bin/module-definition.js -p google && mocha test/test.js"
   },
   "repository": {
     "type": "git",
@@ -17,11 +17,11 @@
   "license": "MIT",
   "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
-    "ast-module-types": "~2.2.2",
-    "node-source-walk": "~1.4.0"
+    "ast-module-types": "^2.3.0",
+    "node-source-walk": "^2.0.0"
   },
   "devDependencies": {
-    "jscs": "~1.7.3",
+    "jscs": "~1.13.1",
     "mocha": "~2.0.1"
   }
 }
