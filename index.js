@@ -50,17 +50,20 @@ function fromSource(source) {
 
     if (hasES6Import || hasES6Export) {
       type = 'es6';
-      return walker.stopWalking();
+      walker.stopWalking();
+      return;
     }
 
     if (hasDefine || hasAMDTopLevelRequire) {
       type = 'amd';
-      return walker.stopWalking();
+      walker.stopWalking();
+      return;
     }
 
     if (hasExports || (hasRequire && !hasDefine)) {
       type = 'commonjs';
-      return walker.stopWalking();
+      walker.stopWalking();
+      return;
     }
   });
 
