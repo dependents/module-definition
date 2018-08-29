@@ -18,7 +18,7 @@
   "homepage": "https://github.com/mrjoelkemp/module-definition",
   "dependencies": {
     "ast-module-types": "^2.3.2",
-    "node-source-walk": "^3.0.0"
+    "node-source-walk": "^4.0.0"
   },
   "engines": {
     "node": ">=6.0"
