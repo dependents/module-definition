@@ -1,6 +1,8 @@
-var Walker  = require('node-source-walk');
-var types   = require('ast-module-types');
-var fs      = require('fs');
+'use strict';
+
+const Walker  = require('node-source-walk');
+const types   = require('ast-module-types');
+const fs      = require('fs');
 
 /**
  * Determines the type of the module from the supplied source code or AST
@@ -13,14 +15,14 @@ function fromSource(source) {
     throw new Error('source not supplied');
   }
 
-  var walker = new Walker();
-  var type = 'none';
-  var hasDefine = false;
-  var hasAMDTopLevelRequire = false;
-  var hasRequire = false;
-  var hasExports = false;
-  var hasES6Import = false;
-  var hasES6Export = false;
+  const walker = new Walker();
+  let type = 'none';
+  let hasDefine = false;
+  let hasAMDTopLevelRequire = false;
+  let hasRequire = false;
+  let hasExports = false;
+  let hasES6Import = false;
+  let hasES6Export = false;
 
   // Walker accepts as AST to avoid reparsing
   walker.walk(source, function(node) {
@@ -81,7 +83,7 @@ function sync(file) {
     throw new Error('filename missing');
   }
 
-  var data = fs.readFileSync(file, 'utf8');
+  const data = fs.readFileSync(file, 'utf8');
   return fromSource(data.toString());
 }
 
@@ -100,14 +102,14 @@ module.exports = function(filepath, cb) {
     throw new Error('callback missing');
   }
 
-  var opts = {encoding: 'utf8'};
+  const opts = {encoding: 'utf8'};
 
   fs.readFile(filepath, opts, function(err, data) {
     if (err) {
       return cb(err);
     }
 
-    var type;
+    let type;
 
     try {
       type = fromSource(data);
