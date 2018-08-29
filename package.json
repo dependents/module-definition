@@ -20,6 +20,9 @@
     "ast-module-types": "^2.3.2",
     "node-source-walk": "^3.0.0"
   },
+  "engines": {
+    "node": ">=6.0"
+  },
   "devDependencies": {
     "jscs": "~2.11.0",
     "jscs-preset-mrjoelkemp": "~1.0.0",
