@@ -1,11 +1,13 @@
-var getModuleType = require('../');
-var path = require('path');
-var fs = require('fs');
-var assert = require('assert');
-var amdAST = require('./amdAST');
+'use strict';
+
+const getModuleType = require('../');
+const path = require('path');
+const fs = require('fs');
+const assert = require('assert');
+const amdAST = require('./amdAST');
 
 describe('module-definition', function() {
-  var expected = {
+  const expected = {
     cjsExport: 'commonjs',
     cjsRequire: 'commonjs',
     amdNoDep: 'amd',
@@ -38,15 +40,15 @@ describe('module-definition', function() {
 
   function syncTest(filename, result) {
     it('should return `' + result + '` as type of ' + filename, function() {
-      var type = getModuleType.sync(path.resolve(__dirname, filename));
+      const type = getModuleType.sync(path.resolve(__dirname, filename));
       assert.equal(type, result);
     });
   }
 
   function sourceTest(filename, result) {
     it('should return `' + result + '` as type of ' + filename, function() {
-      var source = fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
-      var type = getModuleType.fromSource(source);
+      const source = fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
+      const type = getModuleType.fromSource(source);
 
       assert.equal(type, result);
     });
