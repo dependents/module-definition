@@ -107,5 +107,9 @@ describe('module-definition', function() {
     it('should accept an AST', function() {
       assert(getModuleType.fromSource(amdAST) === 'amd');
     });
+
+    it('should deem a main require as commonjs', function() {
+      assert(getModuleType.fromSource('require.main.require();') === 'commonjs');
+    });
   });
 });
