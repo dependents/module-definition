@@ -76,14 +76,15 @@ function fromSource(source) {
  * Synchronously determine the module type for the contents of the passed filepath
  *
  * @param  {String} file
+ * @param  {Object} options
  * @return {String}
  */
-function sync(file) {
+function sync(file, options) {
   if (!file) {
     throw new Error('filename missing');
-  }
-
-  const data = fs.readFileSync(file, 'utf8');
+  } 
+  var fileSystem = options ? (options.fileSystem || fs) : fs;
+  const data = fileSystem.readFileSync(file, 'utf8');
   return fromSource(data.toString());
 }
 
@@ -93,7 +94,7 @@ function sync(file) {
  * @param  {String}   filepath
  * @param  {Function} cb - Executed with (err, type)
  */
-module.exports = function(filepath, cb) {
+module.exports = function(filepath, cb, options) {
   if (!filepath) {
     throw new Error('filename missing');
   }
@@ -103,8 +104,9 @@ module.exports = function(filepath, cb) {
   }
 
   const opts = {encoding: 'utf8'};
+  var fileSystem = options ? (options.fileSystem || fs) : fs;
 
-  fs.readFile(filepath, opts, function(err, data) {
+  fileSystem.readFile(filepath, opts, function(err, data) {
     if (err) {
       return cb(err);
     }
