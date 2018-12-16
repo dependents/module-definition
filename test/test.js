@@ -89,7 +89,6 @@ describe('module-definition', function() {
       const unionfs = require('unionfs');
       const memfs = require('memfs');
 
-      // mount files specified by "mockedFiles.js.ts" to "app" base directory.
       var vol = memfs.Volume.fromJSON({
           'bar.js': "\/\/ commonjs\r\nmodule.exports = function () {\r\n  console.log('booyah');\r\n};" }         
         , '/foo');
@@ -118,7 +117,6 @@ describe('module-definition', function() {
       const unionfs = require('unionfs');
       const memfs = require('memfs');
 
-      // mount files specified by "mockedFiles.js.ts" to "app" base directory.
       var vol = memfs.Volume.fromJSON({
           'bar.js': "\/\/ commonjs\r\nmodule.exports = function () {\r\n  console.log('booyah');\r\n};" }         
         , '/foo');
