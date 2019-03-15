@@ -82,7 +82,7 @@ function fromSource(source) {
 function sync(file, options) {
   if (!file) {
     throw new Error('filename missing');
-  } 
+  }
   var fileSystem = options ? (options.fileSystem || fs) : fs;
   const data = fileSystem.readFileSync(file, 'utf8');
   return fromSource(data.toString());

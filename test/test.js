@@ -35,7 +35,7 @@ describe('module-definition', function() {
         assert.equal(type, result);
         done();
       });
-    });   
+    });
   }
 
   function syncTest(filename, result) {
@@ -90,14 +90,13 @@ describe('module-definition', function() {
       const memfs = require('memfs');
 
       var vol = memfs.Volume.fromJSON({
-          'bar.js': "\/\/ commonjs\r\nmodule.exports = function () {\r\n  console.log('booyah');\r\n};" }         
-        , '/foo');
-
+          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
+          , '/foo');
       var ufs = unionfs.ufs.use(vol);
 
       getModuleType('/foo/bar.js', function(error, type) {
         assert.strictEqual(error, null, error);
-        assert.equal("commonjs", type);
+        assert.equal('commonjs', type);
         done();
       }, {fileSystem: ufs});
     });
@@ -118,14 +117,13 @@ describe('module-definition', function() {
       const memfs = require('memfs');
 
       var vol = memfs.Volume.fromJSON({
-          'bar.js': "\/\/ commonjs\r\nmodule.exports = function () {\r\n  console.log('booyah');\r\n};" }         
+          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
         , '/foo');
 
       var ufs = unionfs.ufs.use(vol);
 
       var type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
-      assert.equal("commonjs", type);
-     
+      assert.equal('commonjs', type);
     });
   });
 
@@ -146,6 +144,4 @@ describe('module-definition', function() {
       assert(getModuleType.fromSource('require.main.require();') === 'commonjs');
     });
   });
-
-  
 });
