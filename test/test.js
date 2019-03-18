@@ -83,6 +83,23 @@ describe('module-definition', function() {
         getModuleType();
       }, /filename/);
     });
+
+    it('should use an alternative file system if provided', function(done) {
+
+      const unionfs = require('unionfs');
+      const memfs = require('memfs');
+
+      var vol = memfs.Volume.fromJSON({
+          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
+          , '/foo');
+      var ufs = unionfs.ufs.use(vol);
+
+      getModuleType('/foo/bar.js', function(error, type) {
+        assert.strictEqual(error, null, error);
+        assert.equal('commonjs', type);
+        done();
+      }, {fileSystem: ufs});
+    });
   });
 
   describe('Sync tests', function() {
@@ -92,6 +109,21 @@ describe('module-definition', function() {
       assert.throws(function() {
         getModuleType.sync();
       }, /filename/);
+    });
+
+    it('should use an alternative file system if provided', function() {
+
+      const unionfs = require('unionfs');
+      const memfs = require('memfs');
+
+      var vol = memfs.Volume.fromJSON({
+          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
+        , '/foo');
+
+      var ufs = unionfs.ufs.use(vol);
+
+      var type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
+      assert.equal('commonjs', type);
     });
   });
 
