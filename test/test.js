@@ -19,7 +19,8 @@ describe('module-definition', function() {
     amdREM: 'amd',
     es6Import: 'es6',
     es6Export: 'es6',
-    es6WithRequire: 'es6'
+    es6WithRequire: 'es6',
+    es6WithDynamicImport: 'es6'
   };
 
   function testMethodAgainstExpected(method) {
