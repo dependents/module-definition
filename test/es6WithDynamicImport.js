@@ -1,0 +1,3 @@
+function foo() {
+  import("./bar");
+}
