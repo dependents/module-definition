@@ -1,6 +1,6 @@
 {
   "name": "module-definition",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Determines if a file is using a CommonJS or AMD module definition",
   "main": "index.js",
   "bin": {
