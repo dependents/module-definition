@@ -1,8 +1,8 @@
 'use strict';
 
-const Walker  = require('node-source-walk');
-const types   = require('ast-module-types');
-const fs      = require('fs');
+const fs = require('fs');
+const Walker = require('node-source-walk');
+const types = require('ast-module-types');
 
 /**
  * Determines the type of the module from the supplied source code or AST
@@ -11,9 +11,7 @@ const fs      = require('fs');
  * @return {String}
  */
 function fromSource(source) {
-  if (typeof source === 'undefined') {
-    throw new Error('source not supplied');
-  }
+  if (typeof source === 'undefined') throw new Error('source not supplied');
 
   const walker = new Walker();
   let type = 'none';
@@ -23,33 +21,16 @@ function fromSource(source) {
   let hasExports = false;
   let hasES6Import = false;
   let hasES6Export = false;
-  let hasDynamicImport = false;
+  const hasDynamicImport = false;
 
   // Walker accepts as AST to avoid reparsing
-  walker.walk(source, function(node) {
-    if (types.isDefineAMD(node)) {
-      hasDefine = true;
-    }
-
-    if (types.isRequire(node)) {
-      hasRequire = true;
-    }
-
-    if (types.isExports(node)) {
-      hasExports = true;
-    }
-
-    if (types.isAMDDriverScriptRequire(node)) {
-      hasAMDTopLevelRequire = true;
-    }
-
-    if (types.isES6Import(node)) {
-      hasES6Import = true;
-    }
-
-    if (types.isES6Export(node)) {
-      hasES6Export = true;
-    }
+  walker.walk(source, (node) => {
+    if (types.isDefineAMD(node)) hasDefine = true;
+    if (types.isRequire(node)) hasRequire = true;
+    if (types.isExports(node)) hasExports = true;
+    if (types.isAMDDriverScriptRequire(node)) hasAMDTopLevelRequire = true;
+    if (types.isES6Import(node)) hasES6Import = true;
+    if (types.isES6Export(node)) hasES6Export = true;
 
     if (hasES6Import || hasES6Export || hasDynamicImport) {
       type = 'es6';
@@ -66,7 +47,6 @@ function fromSource(source) {
     if (hasExports || (hasRequire && !hasDefine)) {
       type = 'commonjs';
       walker.stopWalking();
-      return;
     }
   });
 
@@ -76,17 +56,17 @@ function fromSource(source) {
 /**
  * Synchronously determine the module type for the contents of the passed filepath
  *
- * @param  {String} file
+ * @param  {String} filepath
  * @param  {Object} options
  * @return {String}
  */
-function sync(file, options) {
-  if (!file) {
-    throw new Error('filename missing');
-  }
-  var fileSystem = options ? (options.fileSystem || fs) : fs;
-  const data = fileSystem.readFileSync(file, 'utf8');
-  return fromSource(data.toString());
+function sync(filepath, options = {}) {
+  if (!filepath) throw new Error('filename missing');
+
+  const fileSystem = options.fileSystem ? options.fileSystem : fs;
+  const data = fileSystem.readFileSync(filepath, 'utf8');
+
+  return fromSource(data);
 }
 
 /**
@@ -94,23 +74,16 @@ function sync(file, options) {
  *
  * @param  {String}   filepath
  * @param  {Function} cb - Executed with (err, type)
+ * @param  {Object}   options
  */
-module.exports = function(filepath, cb, options) {
-  if (!filepath) {
-    throw new Error('filename missing');
-  }
+module.exports = function(filepath, cb, options = {}) {
+  if (!filepath) throw new Error('filename missing');
+  if (!cb) throw new Error('callback missing');
 
-  if (!cb) {
-    throw new Error('callback missing');
-  }
+  const fileSystem = options.fileSystem ? options.fileSystem : fs;
 
-  const opts = {encoding: 'utf8'};
-  var fileSystem = options ? (options.fileSystem || fs) : fs;
-
-  fileSystem.readFile(filepath, opts, function(err, data) {
-    if (err) {
-      return cb(err);
-    }
+  fileSystem.readFile(filepath, 'utf8', (err, data) => {
+    if (err) return cb(err);
 
     let type;
 

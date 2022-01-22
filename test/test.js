@@ -1,149 +1,148 @@
+/* eslint-env mocha */
+
 'use strict';
 
-const getModuleType = require('../');
-const path = require('path');
-const fs = require('fs');
+// TODO switch to assert.strict
 const assert = require('assert');
-const amdAST = require('./amdAST');
+const fs = require('fs');
+const path = require('path');
+const unionfs = require('unionfs');
+const memfs = require('memfs');
+const getModuleType = require('../index.js');
+const amdAST = require('./fixtures/amdAST.js');
 
-describe('module-definition', function() {
-  const expected = {
-    cjsExport: 'commonjs',
-    cjsRequire: 'commonjs',
-    amdNoDep: 'amd',
-    iife: 'none',
-    amdFactory: 'amd',
-    amdDeps: 'amd',
-    cjsTopRequire: 'commonjs',
-    empty: 'none',
-    amdREM: 'amd',
-    es6Import: 'es6',
-    es6Export: 'es6',
-    es6WithRequire: 'es6',
-    es6WithDynamicImport: 'es6',
-    notAmd: 'none'
+const expected = {
+  cjsExport: 'commonjs',
+  cjsRequire: 'commonjs',
+  amdNoDep: 'amd',
+  iife: 'none',
+  amdFactory: 'amd',
+  amdDeps: 'amd',
+  cjsTopRequire: 'commonjs',
+  empty: 'none',
+  amdREM: 'amd',
+  es6Import: 'es6',
+  es6Export: 'es6',
+  es6WithRequire: 'es6',
+  es6WithDynamicImport: 'es6',
+  notAmd: 'none'
+};
+
+const memfsSample = `
+  // commonjs
+  module.exports = function () {
+    console.log("booyah");
   };
+`;
 
-  function testMethodAgainstExpected(method) {
-    Object.keys(expected).forEach(function(file) {
-      method('./' + file + '.js', expected[file]);
+function testMethodAgainstExpected(method) {
+  // TODO: switch to Object.entries
+  Object.keys(expected).forEach((file) => {
+    method('./' + file + '.js', expected[file]);
+  });
+}
+
+function asyncTest(filename, result) {
+  it('should return `' + result + '` as type of ' + filename, (done) => {
+    getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
+      assert.strictEqual(error, null, error);
+      assert.strictEqual(type, result);
+      done();
     });
-  }
+  });
+}
 
-  function asyncTest(filename, result) {
-    it('should return `' + result + '` as type of ' + filename, function(done) {
-      getModuleType(path.resolve(__dirname, filename), function(error, type) {
-        assert.strictEqual(error, null, error);
-        assert.equal(type, result);
-        done();
-      });
-    });
-  }
+function syncTest(filename, result) {
+  it('should return `' + result + '` as type of ' + filename, () => {
+    const type = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
+    assert.strictEqual(type, result);
+  });
+}
 
-  function syncTest(filename, result) {
-    it('should return `' + result + '` as type of ' + filename, function() {
-      const type = getModuleType.sync(path.resolve(__dirname, filename));
-      assert.equal(type, result);
-    });
-  }
+function sourceTest(filename, result) {
+  it('should return `' + result + '` as type of ' + filename, () => {
+    const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
+    const type = getModuleType.fromSource(source);
 
-  function sourceTest(filename, result) {
-    it('should return `' + result + '` as type of ' + filename, function() {
-      const source = fs.readFileSync(path.resolve(__dirname, filename), 'utf8');
-      const type = getModuleType.fromSource(source);
+    assert.strictEqual(type, result);
+  });
+}
 
-      assert.equal(type, result);
-    });
-  }
-
-  describe('Async tests', function() {
+describe('module-definition', () => {
+  describe('Async tests', () => {
     testMethodAgainstExpected(asyncTest);
 
-    it('should report an error for non-existing file', function(done) {
-      getModuleType('no_such_file', function(error, type) {
+    it('should report an error for non-existing file', (done) => {
+      getModuleType('no_such_file', (error) => {
         assert.notStrictEqual(error, null);
-        // ENOENT errors always contains filename
-        assert.notEqual(error.toString().indexOf('no_such_file'), -1, error);
+        // ENOENT errors always contain filename
+        assert.notStrictEqual(error.toString().includes('no_such_file'), false, error);
         done();
       });
     });
 
-    it('should report an error for file with syntax error', function(done) {
-      getModuleType(path.resolve(__dirname, 'j.js'), function(error, type) {
+    it('should report an error for file with syntax error', (done) => {
+      getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), (error) => {
         assert.notStrictEqual(error, null);
         // Check error not to be ENOENT
-        assert.equal(error.toString().indexOf('j.js'), -1, error);
+        assert.strictEqual(error.toString().includes('j.js'), false, error);
         done();
       });
     });
 
-    it('should throw an error if argument is missing', function() {
-      assert.throws(function() {
+    it('should throw an error if argument is missing', () => {
+      assert.throws(() => {
         getModuleType(path.resolve(__dirname, 'a.js'));
       }, /callback/);
-      assert.throws(function() {
+      assert.throws(() => {
         getModuleType();
       }, /filename/);
     });
 
-    it('should use an alternative file system if provided', function(done) {
+    it('should use an alternative file system if provided', (done) => {
+      const vol = memfs.Volume.fromJSON({'bar.js': memfsSample}, '/foo');
+      const ufs = unionfs.ufs.use(vol);
 
-      const unionfs = require('unionfs');
-      const memfs = require('memfs');
-
-      var vol = memfs.Volume.fromJSON({
-          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
-          , '/foo');
-      var ufs = unionfs.ufs.use(vol);
-
-      getModuleType('/foo/bar.js', function(error, type) {
+      getModuleType('/foo/bar.js', (error, type) => {
         assert.strictEqual(error, null, error);
-        assert.equal('commonjs', type);
+        assert.strictEqual('commonjs', type);
         done();
       }, {fileSystem: ufs});
     });
   });
 
-  describe('Sync tests', function() {
+  describe('Sync tests', () => {
     testMethodAgainstExpected(syncTest);
 
-    it('should throw an error if argument is missing', function() {
-      assert.throws(function() {
+    it('should throw an error if argument is missing', () => {
+      assert.throws(() => {
         getModuleType.sync();
       }, /filename/);
     });
 
-    it('should use an alternative file system if provided', function() {
-
-      const unionfs = require('unionfs');
-      const memfs = require('memfs');
-
-      var vol = memfs.Volume.fromJSON({
-          'bar.js': '// commonjs\r\nmodule.exports = function () {\r\n  console.log(\'booyah\');\r\n};'}
-        , '/foo');
-
-      var ufs = unionfs.ufs.use(vol);
-
-      var type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
-      assert.equal('commonjs', type);
+    it('should use an alternative file system if provided', () => {
+      const vol = memfs.Volume.fromJSON({'bar.js': memfsSample}, '/foo');
+      const ufs = unionfs.ufs.use(vol);
+      const type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
+      assert.strictEqual('commonjs', type);
     });
   });
 
-  describe('From source tests', function() {
+  describe('From source tests', () => {
     testMethodAgainstExpected(sourceTest);
 
-    it('should throw an error if argument is missing', function() {
-      assert.throws(function() {
+    it('should throw an error if argument is missing', () => {
+      assert.throws(() => {
         getModuleType.fromSource();
       }, /source/);
     });
 
-    it('should accept an AST', function() {
-      assert(getModuleType.fromSource(amdAST) === 'amd');
+    it('should accept an AST', () => {
+      assert.strictEqual(getModuleType.fromSource(amdAST), 'amd');
     });
 
-    it('should deem a main require as commonjs', function() {
-      assert(getModuleType.fromSource('require.main.require();') === 'commonjs');
+    it('should deem a main require as commonjs', () => {
+      assert.strictEqual(getModuleType.fromSource('require.main.require();'), 'commonjs');
     });
   });
 });
