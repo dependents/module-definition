@@ -13,7 +13,7 @@ npm install module-definition
 const getModuleType = require('module-definition');
 
 // Async
-getModuleType('myscript.js', function (err, type) {
+getModuleType('myscript.js', (err, type) => {
   console.log(type);
 });
 
@@ -26,7 +26,7 @@ type = getModuleType.fromSource('define({foo: "foo"});');
 console.log(type);
 ```
 
-Passes one of the following strings to the given callback or returns the string in sync api:
+Passes one of the following strings to the given callback or returns the string in sync API:
 
 * amd
 * commonjs
@@ -35,7 +35,7 @@ Passes one of the following strings to the given callback or returns the string 
 
 * You may also pass an AST to `fromSource` to avoid an internal parsing of the source
 
-When specifying a filename, using the sync or async api, you can also provide an `options` object with an alternative `fs` implementation used to read the source file with.
+When specifying a filename, using the sync or async API, you can also provide an `options` object with an alternative `fs` implementation used to read the source file with.
 
 ```js
 const myFs = GetFs();
