@@ -2,8 +2,7 @@
 
 'use strict';
 
-// TODO switch to assert.strict
-const assert = require('assert');
+const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
 const unionfs = require('unionfs');
@@ -45,8 +44,8 @@ function testMethodAgainstExpected(method) {
 function asyncTest(filename, result) {
   it('should return `' + result + '` as type of ' + filename, (done) => {
     getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
-      assert.strictEqual(error, null, error);
-      assert.strictEqual(type, result);
+      assert.equal(error, null, error);
+      assert.equal(type, result);
       done();
     });
   });
@@ -55,7 +54,7 @@ function asyncTest(filename, result) {
 function syncTest(filename, result) {
   it('should return `' + result + '` as type of ' + filename, () => {
     const type = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
-    assert.strictEqual(type, result);
+    assert.equal(type, result);
   });
 }
 
@@ -64,7 +63,7 @@ function sourceTest(filename, result) {
     const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
     const type = getModuleType.fromSource(source);
 
-    assert.strictEqual(type, result);
+    assert.equal(type, result);
   });
 }
 
@@ -74,18 +73,18 @@ describe('module-definition', () => {
 
     it('should report an error for non-existing file', (done) => {
       getModuleType('no_such_file', (error) => {
-        assert.notStrictEqual(error, null);
+        assert.notEqual(error, null);
         // ENOENT errors always contain filename
-        assert.notStrictEqual(error.toString().includes('no_such_file'), false, error);
+        assert.notEqual(error.toString().includes('no_such_file'), false, error);
         done();
       });
     });
 
     it('should report an error for file with syntax error', (done) => {
       getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), (error) => {
-        assert.notStrictEqual(error, null);
+        assert.notEqual(error, null);
         // Check error not to be ENOENT
-        assert.strictEqual(error.toString().includes('j.js'), false, error);
+        assert.equal(error.toString().includes('j.js'), false, error);
         done();
       });
     });
@@ -104,8 +103,8 @@ describe('module-definition', () => {
       const ufs = unionfs.ufs.use(vol);
 
       getModuleType('/foo/bar.js', (error, type) => {
-        assert.strictEqual(error, null, error);
-        assert.strictEqual('commonjs', type);
+        assert.equal(error, null, error);
+        assert.equal('commonjs', type);
         done();
       }, {fileSystem: ufs});
     });
@@ -124,7 +123,7 @@ describe('module-definition', () => {
       const vol = memfs.Volume.fromJSON({'bar.js': memfsSample}, '/foo');
       const ufs = unionfs.ufs.use(vol);
       const type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
-      assert.strictEqual('commonjs', type);
+      assert.equal('commonjs', type);
     });
   });
 
@@ -138,11 +137,11 @@ describe('module-definition', () => {
     });
 
     it('should accept an AST', () => {
-      assert.strictEqual(getModuleType.fromSource(amdAST), 'amd');
+      assert.equal(getModuleType.fromSource(amdAST), 'amd');
     });
 
     it('should deem a main require as commonjs', () => {
-      assert.strictEqual(getModuleType.fromSource('require.main.require();'), 'commonjs');
+      assert.equal(getModuleType.fromSource('require.main.require();'), 'commonjs');
     });
   });
 });

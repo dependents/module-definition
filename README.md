@@ -1,4 +1,4 @@
-# module-definition [![CI](https://github.com/dependents/module-definition/actions/workflows/ci.yml/badge.svg)](https://github.com/dependents/module-definition/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/module-definition)](https://www.npmjs.com/package/module-definition) [![npm](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
+# module-definition [![CI](https://img.shields.io/github/workflow/status/dependents/module-definition/CI/main?label=CI&logo=github)](https://github.com/dependents/module-definition/actions/workflows/ci.yml?query=branch%3Amain) [![npm version](https://img.shields.io/npm/v/module-definition)](https://www.npmjs.com/package/module-definition) [![npm downloads](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
 
 Determines the module definition type (CommonJS, AMD, ES6, or none) for a given JavaScript file
 by walking through the AST.
@@ -33,7 +33,7 @@ Passes one of the following strings to the given callback or returns the string 
 * es6
 * none
 
-* You may also pass an AST to `fromSource` to avoid an internal parsing of the source
+You may also pass an AST to `fromSource` to avoid an internal parsing of the source
 
 When specifying a filename, using the sync or async API, you can also provide an `options` object with an alternative `fs` implementation used to read the source file with.
 
