@@ -35,14 +35,13 @@ const memfsSample = `
 `;
 
 function testMethodAgainstExpected(method) {
-  // TODO: switch to Object.entries
-  Object.keys(expected).forEach((file) => {
-    method('./' + file + '.js', expected[file]);
-  });
+  for (const [file, type] of Object.entries(expected)) {
+    method(`./${file}.js`, type);
+  };
 }
 
 function asyncTest(filename, result) {
-  it('should return `' + result + '` as type of ' + filename, (done) => {
+  it(`should return "${result}" as type of ${filename}`, (done) => {
     getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
       assert.equal(error, null, error);
       assert.equal(type, result);
@@ -52,17 +51,16 @@ function asyncTest(filename, result) {
 }
 
 function syncTest(filename, result) {
-  it('should return `' + result + '` as type of ' + filename, () => {
+  it(`should return "${result}" as type of ${filename}`, () => {
     const type = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
     assert.equal(type, result);
   });
 }
 
 function sourceTest(filename, result) {
-  it('should return `' + result + '` as type of ' + filename, () => {
+  it(`should return "${result}" as type of ${filename}`, () => {
     const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
     const type = getModuleType.fromSource(source);
-
     assert.equal(type, result);
   });
 }
