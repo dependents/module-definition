@@ -23,7 +23,7 @@ function fromSource(source) {
   let hasES6Export = false;
   const hasDynamicImport = false;
 
-  // Walker accepts as AST to avoid reparsing
+  // Walker accepts an AST to avoid reparsing
   walker.walk(source, (node) => {
     if (types.isDefineAMD(node)) hasDefine = true;
     if (types.isRequire(node)) hasRequire = true;
@@ -44,7 +44,7 @@ function fromSource(source) {
       return;
     }
 
-    if (hasExports || (hasRequire && !hasDefine)) {
+    if (hasExports || hasRequire) {
       type = 'commonjs';
       walker.stopWalking();
     }
