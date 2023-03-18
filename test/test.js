@@ -37,7 +37,7 @@ const memfsSample = `
 function testMethodAgainstExpected(method) {
   for (const [file, type] of Object.entries(expected)) {
     method(`./${file}.js`, type);
-  };
+  }
 }
 
 function asyncTest(filename, result) {
