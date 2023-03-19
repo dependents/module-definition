@@ -32,8 +32,8 @@
     "node": ">=12"
   },
   "dependencies": {
-    "ast-module-types": "^3.0.0",
-    "node-source-walk": "^5.0.0"
+    "ast-module-types": "^4.0.0",
+    "node-source-walk": "^5.0.1"
   },
   "devDependencies": {
     "c8": "^7.13.0",
