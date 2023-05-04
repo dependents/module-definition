@@ -1,4 +1,8 @@
-# module-definition [![CI](https://img.shields.io/github/actions/workflow/status/dependents/module-definition/ci.yml?branch=main&label=CI&logo=github)](https://github.com/dependents/module-definition/actions/workflows/ci.yml?query=branch%3Amain) [![npm version](https://img.shields.io/npm/v/module-definition)](https://www.npmjs.com/package/module-definition) [![npm downloads](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
+# module-definition
+
+[![CI](https://img.shields.io/github/actions/workflow/status/dependents/module-definition/ci.yml?branch=main&label=CI&logo=github)](https://github.com/dependents/module-definition/actions/workflows/ci.yml?query=branch%3Amain)
+[![npm version](https://img.shields.io/npm/v/module-definition)](https://www.npmjs.com/package/module-definition)
+[![npm downloads](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
 
 Determines the module definition type (CommonJS, AMD, ES6, or none) for a given JavaScript file
 by walking through the AST.
@@ -7,13 +11,13 @@ by walking through the AST.
 npm install module-definition
 ```
 
-### Usage
+## Usage
 
 ```js
 const getModuleType = require('module-definition');
 
 // Async
-getModuleType('myscript.js', (err, type) => {
+getModuleType('myscript.js', (error, type) => {
   console.log(type);
 });
 
@@ -33,16 +37,16 @@ Passes one of the following strings to the given callback or returns the string 
 * es6
 * none
 
-You may also pass an AST to `fromSource` to avoid an internal parsing of the source
+You may also pass an AST to `fromSource` to avoid an internal parsing of the source.
 
 When specifying a filename, using the sync or async API, you can also provide an `options` object with an alternative `fs` implementation used to read the source file with.
 
 ```js
 const myFs = GetFs();
-const options = {fileSystem: myFs}
+const options = { fileSystem: myFs };
 
 // Async
-getModuleType('myscript.js', (err, type) => {
+getModuleType('myscript.js', (error, type) => {
   console.log(type);
 }, options);
 
@@ -50,8 +54,14 @@ getModuleType('myscript.js', (err, type) => {
 const type = getModuleType.sync('myscript.js', options);
 ```
 
-Via shell command (requires a global install: `npm install -g module-definition`)
+## CLI
+
+*Assumes a global install module-definition with `npm install -g module-definition`*
 
 ```sh
 module-definition filename
 ```
+
+### License
+
+[MIT](LICENSE)

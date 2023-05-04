@@ -5,8 +5,8 @@
 const assert = require('assert').strict;
 const fs = require('fs');
 const path = require('path');
-const unionfs = require('unionfs');
 const memfs = require('memfs');
+const unionfs = require('unionfs');
 const getModuleType = require('../index.js');
 const amdAST = require('./fixtures/amdAST.js');
 
@@ -41,7 +41,7 @@ function testMethodAgainstExpected(method) {
 }
 
 function asyncTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, (done) => {
+  it(`should return "${result}" as type of ${filename}`, done => {
     getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
       assert.equal(error, null, error);
       assert.equal(type, result);
@@ -69,8 +69,8 @@ describe('module-definition', () => {
   describe('Async tests', () => {
     testMethodAgainstExpected(asyncTest);
 
-    it('should report an error for non-existing file', (done) => {
-      getModuleType('no_such_file', (error) => {
+    it('should report an error for non-existing file', done => {
+      getModuleType('no_such_file', error => {
         assert.notEqual(error, null);
         // ENOENT errors always contain filename
         assert.notEqual(error.toString().includes('no_such_file'), false, error);
@@ -78,8 +78,8 @@ describe('module-definition', () => {
       });
     });
 
-    it('should report an error for file with syntax error', (done) => {
-      getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), (error) => {
+    it('should report an error for file with syntax error', done => {
+      getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), error => {
         assert.notEqual(error, null);
         // Check error not to be ENOENT
         assert.equal(error.toString().includes('j.js'), false, error);
@@ -96,15 +96,15 @@ describe('module-definition', () => {
       }, /filename/);
     });
 
-    it('should use an alternative file system if provided', (done) => {
-      const vol = memfs.Volume.fromJSON({'bar.js': memfsSample}, '/foo');
+    it('should use an alternative file system if provided', done => {
+      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
       const ufs = unionfs.ufs.use(vol);
 
       getModuleType('/foo/bar.js', (error, type) => {
         assert.equal(error, null, error);
         assert.equal('commonjs', type);
         done();
-      }, {fileSystem: ufs});
+      }, { fileSystem: ufs });
     });
   });
 
@@ -118,9 +118,9 @@ describe('module-definition', () => {
     });
 
     it('should use an alternative file system if provided', () => {
-      const vol = memfs.Volume.fromJSON({'bar.js': memfsSample}, '/foo');
+      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
       const ufs = unionfs.ufs.use(vol);
-      const type = getModuleType.sync('/foo/bar.js', {fileSystem: ufs});
+      const type = getModuleType.sync('/foo/bar.js', { fileSystem: ufs });
       assert.equal('commonjs', type);
     });
   });

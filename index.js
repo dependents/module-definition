@@ -11,7 +11,7 @@ const types = require('ast-module-types');
  * @return {String}
  */
 function fromSource(source) {
-  if (typeof source === 'undefined') throw new Error('source not supplied');
+  if (source === undefined) throw new Error('source not supplied');
 
   const walker = new Walker();
   let type = 'none';
@@ -24,7 +24,7 @@ function fromSource(source) {
   const hasDynamicImport = false;
 
   // Walker accepts as AST to avoid reparsing
-  walker.walk(source, (node) => {
+  walker.walk(source, node => {
     if (types.isDefineAMD(node)) hasDefine = true;
     if (types.isRequire(node)) hasRequire = true;
     if (types.isExports(node)) hasExports = true;
@@ -63,7 +63,7 @@ function fromSource(source) {
 function sync(filepath, options = {}) {
   if (!filepath) throw new Error('filename missing');
 
-  const fileSystem = options.fileSystem ? options.fileSystem : fs;
+  const fileSystem = options.fileSystem ?? fs;
   const data = fileSystem.readFileSync(filepath, 'utf8');
 
   return fromSource(data);
@@ -73,27 +73,28 @@ function sync(filepath, options = {}) {
  * Asynchronously determines the module type for the contents of the given filepath
  *
  * @param  {String}   filepath
- * @param  {Function} cb - Executed with (err, type)
+ * @param  {Function} callback - Executed with (error, type)
  * @param  {Object}   options
  */
-module.exports = function(filepath, cb, options = {}) {
+module.exports = function(filepath, callback, options = {}) {
   if (!filepath) throw new Error('filename missing');
-  if (!cb) throw new Error('callback missing');
+  if (!callback) throw new Error('callback missing');
 
-  const fileSystem = options.fileSystem ? options.fileSystem : fs;
+  const fileSystem = options.fileSystem ?? fs;
 
-  fileSystem.readFile(filepath, 'utf8', (err, data) => {
-    if (err) return cb(err);
+  // eslint-disable-next-line n/prefer-promises/fs
+  fileSystem.readFile(filepath, 'utf8', (error, data) => {
+    if (error) return callback(error);
 
     let type;
 
     try {
       type = fromSource(data);
     } catch (error) {
-      return cb(error);
+      return callback(error);
     }
 
-    cb(null, type);
+    callback(null, type);
   });
 };
 
