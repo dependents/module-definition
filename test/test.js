@@ -3,7 +3,7 @@
 'use strict';
 
 const assert = require('assert').strict;
-const fs = require('fs');
+const { readFile } = require('fs/promises');
 const path = require('path');
 const memfs = require('memfs');
 const unionfs = require('unionfs');
@@ -58,8 +58,8 @@ function syncTest(filename, result) {
 }
 
 function sourceTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, () => {
-    const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
+  it(`should return "${result}" as type of ${filename}`, async() => {
+    const source = await readFile(path.resolve(__dirname, 'fixtures', filename), 'utf8');
     const type = getModuleType.fromSource(source);
     assert.equal(type, result);
   });
@@ -125,8 +125,8 @@ describe('module-definition', () => {
     });
   });
 
-  describe('From source tests', () => {
-    testMethodAgainstExpected(sourceTest);
+  describe('From source tests', async() => {
+    testMethodAgainstExpected(await sourceTest);
 
     it('should throw an error if argument is missing', () => {
       assert.throws(() => {
