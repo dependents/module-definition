@@ -1,7 +1,7 @@
 # module-definition
 
 [![CI](https://img.shields.io/github/actions/workflow/status/dependents/module-definition/ci.yml?branch=main&label=CI&logo=github)](https://github.com/dependents/module-definition/actions/workflows/ci.yml?query=branch%3Amain)
-[![npm version](https://img.shields.io/npm/v/module-definition)](https://www.npmjs.com/package/module-definition)
+[![npm version](https://img.shields.io/npm/v/module-definition?logo=npm&logoColor=fff)](https://www.npmjs.com/package/module-definition)
 [![npm downloads](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
 
 Determines the module definition type (CommonJS, AMD, ES6, or none) for a given JavaScript file
