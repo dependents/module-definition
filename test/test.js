@@ -90,10 +90,10 @@ describe('module-definition', () => {
     it('should throw an error if argument is missing', () => {
       assert.throws(() => {
         getModuleType(path.resolve(__dirname, 'a.js'));
-      }, /callback/);
+      }, /^Error: callback missing$/);
       assert.throws(() => {
         getModuleType();
-      }, /filename/);
+      }, /^Error: filename missing$/);
     });
 
     it('should use an alternative file system if provided', done => {
@@ -114,7 +114,7 @@ describe('module-definition', () => {
     it('should throw an error if argument is missing', () => {
       assert.throws(() => {
         getModuleType.sync();
-      }, /filename/);
+      }, /^Error: filename missing$/);
     });
 
     it('should use an alternative file system if provided', () => {
@@ -131,7 +131,7 @@ describe('module-definition', () => {
     it('should throw an error if argument is missing', () => {
       assert.throws(() => {
         getModuleType.fromSource();
-      }, /source/);
+      }, /^Error: source not supplied$/);
     });
 
     it('should accept an AST', () => {
