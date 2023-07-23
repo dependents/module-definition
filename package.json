@@ -33,13 +33,13 @@
   },
   "dependencies": {
     "ast-module-types": "^5.0.0",
-    "node-source-walk": "^6.0.1"
+    "node-source-walk": "^6.0.2"
   },
   "devDependencies": {
-    "c8": "^7.13.0",
-    "memfs": "^3.5.1",
+    "c8": "^8.0.0",
+    "memfs": "^4.2.0",
     "mocha": "^10.2.0",
-    "unionfs": "^4.4.0",
+    "unionfs": "^4.5.1",
     "xo": "^0.54.2"
   },
   "xo": {
