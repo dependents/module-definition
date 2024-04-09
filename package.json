@@ -29,18 +29,18 @@
   },
   "homepage": "https://github.com/dependents/module-definition",
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "dependencies": {
-    "ast-module-types": "^5.0.0",
-    "node-source-walk": "^6.0.2"
+    "ast-module-types": "^6.0.0",
+    "node-source-walk": "^7.0.0"
   },
   "devDependencies": {
-    "c8": "^8.0.0",
-    "memfs": "^4.2.0",
-    "mocha": "^10.2.0",
-    "unionfs": "^4.5.1",
-    "xo": "^0.54.2"
+    "c8": "^9.1.0",
+    "memfs": "^4.8.1",
+    "mocha": "^10.4.0",
+    "unionfs": "^4.5.4",
+    "xo": "^0.58.0"
   },
   "xo": {
     "space": true,
