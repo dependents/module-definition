@@ -3,8 +3,10 @@
 'use strict';
 
 const assert = require('assert').strict;
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const process = require('process');
 const memfs = require('memfs');
 const unionfs = require('unionfs');
 const getModuleType = require('../index.js');
@@ -140,6 +142,18 @@ describe('module-definition', () => {
 
     it('should deem a main require as commonjs', () => {
       assert.equal(getModuleType.fromSource('require.main.require();'), 'commonjs');
+    });
+  });
+
+  describe('CLI tests', () => {
+    it('should print usage and exit when filename is missing', () => {
+      const cliPath = path.resolve(__dirname, '..', 'bin', 'cli.js');
+      const result = childProcess.spawnSync(process.execPath, [cliPath], {
+        encoding: 'utf8'
+      });
+
+      assert.equal(result.status, 1);
+      assert.match(result.stderr, /Usage: module-definition <filename>/);
     });
   });
 });
