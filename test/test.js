@@ -74,8 +74,7 @@ describe('module-definition', () => {
     it('should report an error for non-existing file', done => {
       getModuleType('no_such_file', error => {
         assert.notEqual(error, null);
-        // ENOENT errors always contain filename
-        assert.notEqual(error.toString().includes('no_such_file'), false, error);
+        assert.equal(error.toString().includes('no_such_file'), true);
         done();
       });
     });
@@ -83,8 +82,7 @@ describe('module-definition', () => {
     it('should report an error for file with syntax error', done => {
       getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), error => {
         assert.notEqual(error, null);
-        // Check error not to be ENOENT
-        assert.equal(error.toString().includes('j.js'), false, error);
+        assert.equal(error.toString().includes('j.js'), false);
         done();
       });
     });
@@ -104,7 +102,7 @@ describe('module-definition', () => {
 
       getModuleType('/foo/bar.js', (error, type) => {
         assert.equal(error, null, error);
-        assert.equal('commonjs', type);
+        assert.equal(type, 'commonjs');
         done();
       }, { fileSystem: ufs });
     });
@@ -123,7 +121,7 @@ describe('module-definition', () => {
       const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
       const ufs = unionfs.ufs.use(vol);
       const type = getModuleType.sync('/foo/bar.js', { fileSystem: ufs });
-      assert.equal('commonjs', type);
+      assert.equal(type, 'commonjs');
     });
   });
 
