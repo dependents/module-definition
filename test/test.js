@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 'use strict';
 
 const assert = require('assert').strict;
@@ -7,10 +5,14 @@ const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const process = require('process');
+const { promisify } = require('util');
 const memfs = require('memfs');
 const unionfs = require('unionfs');
+const { suite } = require('uvu');
 const getModuleType = require('../index.js');
 const amdAST = require('./fixtures/amdAST.js');
+
+const getModuleTypeAsync = promisify(getModuleType);
 
 const expected = {
   cjsExport: 'commonjs',
@@ -36,122 +38,109 @@ const memfsSample = `
   };
 `;
 
-function testMethodAgainstExpected(method) {
-  for (const [file, type] of Object.entries(expected)) {
-    method(`./${file}.js`, type);
-  }
-}
+const asyncTests = suite('Async tests');
+const syncTests = suite('Sync tests');
+const fromSourceTests = suite('From source tests');
+const cliTests = suite('CLI tests');
 
-function asyncTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, done => {
-    getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
-      assert.equal(error, null, error);
-      assert.equal(type, result);
-      done();
-    });
+for (const [file, type] of Object.entries(expected)) {
+  const filename = `./${file}.js`;
+
+  asyncTests(`should return "${type}" as type of ${filename}`, async() => {
+    const actual = await getModuleTypeAsync(path.resolve(__dirname, 'fixtures', filename));
+    assert.equal(actual, type);
   });
-}
 
-function syncTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, () => {
-    const type = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
-    assert.equal(type, result);
+  syncTests(`should return "${type}" as type of ${filename}`, () => {
+    const actual = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
+    assert.equal(actual, type);
   });
-}
 
-function sourceTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, () => {
+  fromSourceTests(`should return "${type}" as type of ${filename}`, () => {
     const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
-    const type = getModuleType.fromSource(source);
-    assert.equal(type, result);
+    const actual = getModuleType.fromSource(source);
+    assert.equal(actual, type);
   });
 }
 
-describe('module-definition', () => {
-  describe('Async tests', () => {
-    testMethodAgainstExpected(asyncTest);
-
-    it('should report an error for non-existing file', done => {
-      getModuleType('no_such_file', error => {
-        assert.notEqual(error, null);
-        assert.equal(error.toString().includes('no_such_file'), true);
-        done();
-      });
-    });
-
-    it('should report an error for file with syntax error', done => {
-      getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), error => {
-        assert.notEqual(error, null);
-        assert.equal(error.toString().includes('j.js'), false);
-        done();
-      });
-    });
-
-    it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
-        getModuleType(path.resolve(__dirname, 'a.js'));
-      }, /^Error: callback missing$/);
-      assert.throws(() => {
-        getModuleType();
-      }, /^Error: filename missing$/);
-    });
-
-    it('should use an alternative file system if provided', done => {
-      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
-      const ufs = unionfs.ufs.use(vol);
-
-      getModuleType('/foo/bar.js', (error, type) => {
-        assert.equal(error, null, error);
-        assert.equal(type, 'commonjs');
-        done();
-      }, { fileSystem: ufs });
-    });
-  });
-
-  describe('Sync tests', () => {
-    testMethodAgainstExpected(syncTest);
-
-    it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
-        getModuleType.sync();
-      }, /^Error: filename missing$/);
-    });
-
-    it('should use an alternative file system if provided', () => {
-      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
-      const ufs = unionfs.ufs.use(vol);
-      const type = getModuleType.sync('/foo/bar.js', { fileSystem: ufs });
-      assert.equal(type, 'commonjs');
-    });
-  });
-
-  describe('From source tests', () => {
-    testMethodAgainstExpected(sourceTest);
-
-    it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
-        getModuleType.fromSource();
-      }, /^Error: source not supplied$/);
-    });
-
-    it('should accept an AST', () => {
-      assert.equal(getModuleType.fromSource(amdAST), 'amd');
-    });
-
-    it('should deem a main require as commonjs', () => {
-      assert.equal(getModuleType.fromSource('require.main.require();'), 'commonjs');
-    });
-  });
-
-  describe('CLI tests', () => {
-    it('should print usage and exit when filename is missing', () => {
-      const cliPath = path.resolve(__dirname, '..', 'bin', 'cli.js');
-      const result = childProcess.spawnSync(process.execPath, [cliPath], {
-        encoding: 'utf8'
-      });
-
-      assert.equal(result.status, 1);
-      assert.match(result.stderr, /Usage: module-definition <filename>/);
-    });
+asyncTests('should report an error for non-existing file', async() => {
+  await assert.rejects(getModuleTypeAsync('no_such_file'), error => {
+    assert.equal(error.toString().includes('no_such_file'), true);
+    return true;
   });
 });
+
+asyncTests('should report an error for file with syntax error', async() => {
+  await assert.rejects(getModuleTypeAsync(path.resolve(__dirname, 'fixtures', 'j.js')), error => {
+    assert.equal(error.toString().includes('j.js'), false);
+    return true;
+  });
+});
+
+asyncTests('should throw an error if argument is missing', () => {
+  assert.throws(() => {
+    getModuleType(path.resolve(__dirname, 'a.js'));
+  }, /^Error: callback missing$/);
+  assert.throws(() => {
+    getModuleType();
+  }, /^Error: filename missing$/);
+});
+
+asyncTests('should use an alternative file system if provided', async() => {
+  const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
+  const ufs = unionfs.ufs.use(vol);
+
+  await new Promise((resolve, reject) => {
+    getModuleType('/foo/bar.js', (error, type) => {
+      try {
+        assert.equal(error, null, error);
+        assert.equal(type, 'commonjs');
+        resolve();
+      } catch (error_) {
+        reject(error_);
+      }
+    }, { fileSystem: ufs });
+  });
+});
+
+syncTests('should throw an error if argument is missing', () => {
+  assert.throws(() => {
+    getModuleType.sync();
+  }, /^Error: filename missing$/);
+});
+
+syncTests('should use an alternative file system if provided', () => {
+  const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
+  const ufs = unionfs.ufs.use(vol);
+  const type = getModuleType.sync('/foo/bar.js', { fileSystem: ufs });
+  assert.equal(type, 'commonjs');
+});
+
+fromSourceTests('should throw an error if argument is missing', () => {
+  assert.throws(() => {
+    getModuleType.fromSource();
+  }, /^Error: source not supplied$/);
+});
+
+fromSourceTests('should accept an AST', () => {
+  assert.equal(getModuleType.fromSource(amdAST), 'amd');
+});
+
+fromSourceTests('should deem a main require as commonjs', () => {
+  assert.equal(getModuleType.fromSource('require.main.require();'), 'commonjs');
+});
+
+cliTests('should print usage and exit when filename is missing', () => {
+  const cliPath = path.resolve(__dirname, '..', 'bin', 'cli.js');
+  const result = childProcess.spawnSync(process.execPath, [cliPath], {
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 1);
+  assert.equal(result.stderr.includes('Usage: module-definition <filename>'), true);
+});
+
+asyncTests.run();
+syncTests.run();
+fromSourceTests.run();
+cliTests.run();
