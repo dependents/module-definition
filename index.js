@@ -14,6 +14,7 @@ function fromSource(source) {
   if (source === undefined) throw new Error('source not supplied');
 
   const walker = new Walker();
+
   let type = 'none';
   let hasDefine = false;
   let hasAMDTopLevelRequire = false;
@@ -21,7 +22,6 @@ function fromSource(source) {
   let hasExports = false;
   let hasES6Import = false;
   let hasES6Export = false;
-  const hasDynamicImport = false;
 
   // Walker accepts as AST to avoid reparsing
   walker.walk(source, node => {
@@ -32,7 +32,7 @@ function fromSource(source) {
     if (types.isES6Import(node)) hasES6Import = true;
     if (types.isES6Export(node)) hasES6Export = true;
 
-    if (hasES6Import || hasES6Export || hasDynamicImport) {
+    if (hasES6Import || hasES6Export) {
       type = 'es6';
       walker.stopWalking();
       return;
