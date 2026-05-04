@@ -4,8 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/module-definition?logo=npm&logoColor=fff)](https://www.npmjs.com/package/module-definition)
 [![npm downloads](https://img.shields.io/npm/dm/module-definition)](https://www.npmjs.com/package/module-definition)
 
-Determines the module definition type (CommonJS, AMD, ES6, or none) for a given JavaScript file
-by walking through the AST.
+Determines the module definition type (CommonJS, AMD, ES6, or none) for a given JavaScript file by walking through the AST.
 
 ```sh
 npm install module-definition
@@ -13,8 +12,29 @@ npm install module-definition
 
 ## Usage
 
+### ESM
+
 ```js
-const getModuleType = require('module-definition');
+import getModuleType from 'module-definition';
+
+// Async
+getModuleType('myscript.js', (error, type) => {
+  console.log(type);
+});
+
+// Sync
+let type = getModuleType.sync('myscript.js');
+console.log(type);
+
+// From source (string or an AST)
+type = getModuleType.fromSource('define({foo: "foo"});');
+console.log(type);
+```
+
+### CJS
+
+```js
+const { default: getModuleType } = require('module-definition');
 
 // Async
 getModuleType('myscript.js', (error, type) => {

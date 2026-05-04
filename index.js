@@ -1,8 +1,6 @@
-'use strict';
-
-const fs = require('fs');
-const Walker = require('node-source-walk');
-const types = require('ast-module-types');
+import fs from 'node:fs';
+import Walker from 'node-source-walk';
+import types from 'ast-module-types';
 
 /**
  * Determines the type of the module from the supplied source code or AST
@@ -76,7 +74,7 @@ function sync(filepath, options = {}) {
  * @param  {Function} callback - Executed with (error, type)
  * @param  {Object}   options
  */
-module.exports = function(filepath, callback, options = {}) {
+function getModuleType(filepath, callback, options = {}) {
   if (!filepath) throw new Error('filename missing');
   if (!callback) throw new Error('callback missing');
 
@@ -90,13 +88,15 @@ module.exports = function(filepath, callback, options = {}) {
 
     try {
       type = fromSource(data);
-    } catch (error) {
+    } catch(error) {
       return callback(error);
     }
 
     callback(null, type);
   });
-};
+}
 
-module.exports.sync = sync;
-module.exports.fromSource = fromSource;
+getModuleType.sync = sync;
+getModuleType.fromSource = fromSource;
+
+export default getModuleType;

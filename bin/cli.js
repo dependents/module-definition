@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-'use strict';
-
-const process = require('process');
-const getModuleType = require('../index.js');
+import process from 'node:process';
+import getModuleType from '../index.js';
 
 const filename = process.argv[2];
 

@@ -1,16 +1,15 @@
-/* eslint-env mocha */
+import assert from 'node:assert/strict';
+import childProcess from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+import { Volume } from 'memfs';
+import { ufs } from 'unionfs';
+import getModuleType from '../index.js';
+import amdAST from './fixtures/amdAST.js';
 
-'use strict';
-
-const assert = require('assert').strict;
-const childProcess = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const memfs = require('memfs');
-const unionfs = require('unionfs');
-const getModuleType = require('../index.js');
-const amdAST = require('./fixtures/amdAST.js');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const expected = {
   cjsExport: 'commonjs',
@@ -97,14 +96,14 @@ describe('module-definition', () => {
     });
 
     it('should use an alternative file system if provided', done => {
-      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
-      const ufs = unionfs.ufs.use(vol);
+      const vol = Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
+      const memUfs = ufs.use(vol);
 
       getModuleType('/foo/bar.js', (error, type) => {
         assert.equal(error, null, error);
         assert.equal(type, 'commonjs');
         done();
-      }, { fileSystem: ufs });
+      }, { fileSystem: memUfs });
     });
   });
 
@@ -118,9 +117,9 @@ describe('module-definition', () => {
     });
 
     it('should use an alternative file system if provided', () => {
-      const vol = memfs.Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
-      const ufs = unionfs.ufs.use(vol);
-      const type = getModuleType.sync('/foo/bar.js', { fileSystem: ufs });
+      const vol = Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
+      const memUfs = ufs.use(vol);
+      const type = getModuleType.sync('/foo/bar.js', { fileSystem: memUfs });
       assert.equal(type, 'commonjs');
     });
   });
