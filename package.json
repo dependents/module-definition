@@ -35,8 +35,8 @@
     "node": ">=20.19.0 || >=22.12.0"
   },
   "dependencies": {
-    "ast-module-types": "^6.0.2",
-    "node-source-walk": "^7.0.2"
+    "ast-module-types": "github:dependents/node-ast-module-types#xmr/dev",
+    "node-source-walk": "github:dependents/node-source-walk#xmr/dev"
   },
   "devDependencies": {
     "c8": "^11.0.0",

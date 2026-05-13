@@ -1,6 +1,13 @@
 import fs from 'node:fs';
 import Walker from 'node-source-walk';
-import types from 'ast-module-types';
+import {
+  isDefineAMD,
+  isRequire,
+  isExports,
+  isAMDDriverScriptRequire,
+  isES6Import,
+  isES6Export
+} from 'ast-module-types';
 
 /**
  * Determines the type of the module from the supplied source code or AST
@@ -23,12 +30,12 @@ function fromSource(source) {
 
   // Walker accepts as AST to avoid reparsing
   walker.walk(source, node => {
-    if (types.isDefineAMD(node)) hasDefine = true;
-    if (types.isRequire(node)) hasRequire = true;
-    if (types.isExports(node)) hasExports = true;
-    if (types.isAMDDriverScriptRequire(node)) hasAMDTopLevelRequire = true;
-    if (types.isES6Import(node)) hasES6Import = true;
-    if (types.isES6Export(node)) hasES6Export = true;
+    if (isDefineAMD(node)) hasDefine = true;
+    if (isRequire(node)) hasRequire = true;
+    if (isExports(node)) hasExports = true;
+    if (isAMDDriverScriptRequire(node)) hasAMDTopLevelRequire = true;
+    if (isES6Import(node)) hasES6Import = true;
+    if (isES6Export(node)) hasES6Export = true;
 
     if (hasES6Import || hasES6Export) {
       type = 'es6';
