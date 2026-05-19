@@ -1,8 +1,13 @@
-'use strict';
-
-const fs = require('fs');
-const Walker = require('node-source-walk');
-const types = require('ast-module-types');
+import fs from 'node:fs';
+import Walker from 'node-source-walk';
+import {
+  isDefineAMD,
+  isRequire,
+  isExports,
+  isAMDDriverScriptRequire,
+  isES6Import,
+  isES6Export
+} from 'ast-module-types';
 
 /**
  * Determines the type of the module from the supplied source code or AST
@@ -25,12 +30,12 @@ function fromSource(source) {
 
   // Walker accepts as AST to avoid reparsing
   walker.walk(source, node => {
-    if (types.isDefineAMD(node)) hasDefine = true;
-    if (types.isRequire(node)) hasRequire = true;
-    if (types.isExports(node)) hasExports = true;
-    if (types.isAMDDriverScriptRequire(node)) hasAMDTopLevelRequire = true;
-    if (types.isES6Import(node)) hasES6Import = true;
-    if (types.isES6Export(node)) hasES6Export = true;
+    if (isDefineAMD(node)) hasDefine = true;
+    if (isRequire(node)) hasRequire = true;
+    if (isExports(node)) hasExports = true;
+    if (isAMDDriverScriptRequire(node)) hasAMDTopLevelRequire = true;
+    if (isES6Import(node)) hasES6Import = true;
+    if (isES6Export(node)) hasES6Export = true;
 
     if (hasES6Import || hasES6Export) {
       type = 'es6';
@@ -76,7 +81,7 @@ function sync(filepath, options = {}) {
  * @param  {Function} callback - Executed with (error, type)
  * @param  {Object}   options
  */
-module.exports = function(filepath, callback, options = {}) {
+function getModuleType(filepath, callback, options = {}) {
   if (!filepath) throw new Error('filename missing');
   if (!callback) throw new Error('callback missing');
 
@@ -90,13 +95,15 @@ module.exports = function(filepath, callback, options = {}) {
 
     try {
       type = fromSource(data);
-    } catch (error) {
+    } catch(error) {
       return callback(error);
     }
 
     callback(null, type);
   });
-};
+}
 
-module.exports.sync = sync;
-module.exports.fromSource = fromSource;
+getModuleType.sync = sync;
+getModuleType.fromSource = fromSource;
+
+export default getModuleType;
