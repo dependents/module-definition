@@ -1,6 +1,6 @@
 {
   "name": "module-definition",
-  "version": "6.0.2",
+  "version": "7.0.0",
   "description": "Determines if a file is using a CommonJS or AMD module definition",
   "type": "module",
   "exports": {
