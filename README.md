@@ -12,28 +12,10 @@ npm install module-definition
 
 ## Usage
 
-### ESM
-
 ```js
+// ESM
 import getModuleType from 'module-definition';
-
-// Async
-getModuleType('myscript.js', (error, type) => {
-  console.log(type);
-});
-
-// Sync
-let type = getModuleType.sync('myscript.js');
-console.log(type);
-
-// From source (string or an AST)
-type = getModuleType.fromSource('define({foo: "foo"});');
-console.log(type);
-```
-
-### CJS
-
-```js
+// CommonJS
 const { default: getModuleType } = require('module-definition');
 
 // Async
