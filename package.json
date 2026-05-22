@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "ast-module-types": "^7.0.0",
+    "commander": "^14.0.3",
     "node-source-walk": "^8.0.0"
   },
   "devDependencies": {

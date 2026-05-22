@@ -61,7 +61,7 @@ const type = getModuleType.sync('myscript.js', options);
 *Assumes a global install module-definition with `npm install -g module-definition`*
 
 ```sh
-module-definition filename
+module-definition <filename>
 ```
 
 ### License

@@ -1,13 +1,20 @@
 #!/usr/bin/env node
 
-import process from 'node:process';
+import { program } from 'commander';
 import getModuleType from '../index.js';
+import pkg from '../package.json' with { type: 'json' };
 
-const filename = process.argv[2];
+const { name, description, version } = pkg;
 
-if (!filename) {
-  console.error('Usage: module-definition <filename>');
-  process.exit(1);
-}
+program
+  .name(name)
+  .description(description)
+  .version(version)
+  .argument('<filename>', 'JavaScript file to examine')
+  .usage('[options] <filename>')
+  .showHelpAfterError()
+  .parse();
+
+const [filename] = program.args;
 
 console.log(getModuleType.sync(filename));

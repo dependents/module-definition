@@ -150,7 +150,18 @@ describe('module-definition', () => {
       });
 
       assert.equal(result.status, 1);
-      assert.match(result.stderr, /Usage: module-definition <filename>/);
+      assert.equal(result.stderr.includes('error: missing required argument \'filename\''), true);
+    });
+
+    it('should print the module type for a given file', () => {
+      const cliPath = path.resolve(__dirname, '..', 'bin', 'cli.js');
+      const fixturePath = path.resolve(__dirname, 'fixtures', 'cjsExport.js');
+      const result = childProcess.spawnSync(process.execPath, [cliPath, fixturePath], {
+        encoding: 'utf8'
+      });
+
+      assert.equal(result.status, 0);
+      assert.equal(result.stdout.trim(), 'commonjs');
     });
   });
 });
