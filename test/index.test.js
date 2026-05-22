@@ -1,15 +1,18 @@
-import assert from 'node:assert/strict';
 import childProcess from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 import { Volume } from 'memfs';
 import { ufs } from 'unionfs';
+import { describe, it, expect } from 'vitest';
 import getModuleType from '../index.js';
 import amdAST from './fixtures/amdAST.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const getModuleTypeAsync = promisify(getModuleType);
 
 const expected = {
   cjsExport: 'commonjs',
@@ -42,19 +45,16 @@ function testMethodAgainstExpected(method) {
 }
 
 function asyncTest(filename, result) {
-  it(`should return "${result}" as type of ${filename}`, done => {
-    getModuleType(path.resolve(__dirname, 'fixtures', filename), (error, type) => {
-      assert.equal(error, null, error);
-      assert.equal(type, result);
-      done();
-    });
+  it(`should return "${result}" as type of ${filename}`, async() => {
+    const type = await getModuleTypeAsync(path.resolve(__dirname, 'fixtures', filename));
+    expect(type).toBe(result);
   });
 }
 
 function syncTest(filename, result) {
   it(`should return "${result}" as type of ${filename}`, () => {
     const type = getModuleType.sync(path.resolve(__dirname, 'fixtures', filename));
-    assert.equal(type, result);
+    expect(type).toBe(result);
   });
 }
 
@@ -62,7 +62,7 @@ function sourceTest(filename, result) {
   it(`should return "${result}" as type of ${filename}`, () => {
     const source = fs.readFileSync(path.resolve(__dirname, 'fixtures', filename), 'utf8');
     const type = getModuleType.fromSource(source);
-    assert.equal(type, result);
+    expect(type).toBe(result);
   });
 }
 
@@ -70,40 +70,42 @@ describe('module-definition', () => {
   describe('Async tests', () => {
     testMethodAgainstExpected(asyncTest);
 
-    it('should report an error for non-existing file', done => {
-      getModuleType('no_such_file', error => {
-        assert.notEqual(error, null);
-        assert.equal(error.toString().includes('no_such_file'), true);
-        done();
-      });
+    it('should report an error for non-existing file', async() => {
+      const error = await getModuleTypeAsync('no_such_file').catch(error_ => error_);
+      expect(error).not.toBe(null);
+      expect(error.toString()).toContain('no_such_file');
     });
 
-    it('should report an error for file with syntax error', done => {
-      getModuleType(path.resolve(__dirname, 'fixtures', 'j.js'), error => {
-        assert.notEqual(error, null);
-        assert.equal(error.toString().includes('j.js'), false);
-        done();
-      });
+    it('should report an error for file with syntax error', async() => {
+      const error = await getModuleTypeAsync(path.resolve(__dirname, 'fixtures', 'j.js')).catch(error_ => error_);
+      expect(error).not.toBe(null);
+      expect(error.toString()).not.toContain('j.js');
     });
 
     it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
+      expect(() => {
         getModuleType(path.resolve(__dirname, 'a.js'));
-      }, /^Error: callback missing$/);
-      assert.throws(() => {
+      }).toThrow(new Error('callback missing'));
+      expect(() => {
         getModuleType();
-      }, /^Error: filename missing$/);
+      }).toThrow(new Error('filename missing'));
     });
 
-    it('should use an alternative file system if provided', done => {
+    it('should use an alternative file system if provided', async() => {
       const vol = Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
       const memUfs = ufs.use(vol);
 
-      getModuleType('/foo/bar.js', (error, type) => {
-        assert.equal(error, null, error);
-        assert.equal(type, 'commonjs');
-        done();
-      }, { fileSystem: memUfs });
+      await new Promise((resolve, reject) => {
+        getModuleType('/foo/bar.js', (error, type) => {
+          try {
+            expect(error).toBe(null);
+            expect(type).toBe('commonjs');
+            resolve();
+          } catch(error_) {
+            reject(error_);
+          }
+        }, { fileSystem: memUfs });
+      });
     });
   });
 
@@ -111,16 +113,16 @@ describe('module-definition', () => {
     testMethodAgainstExpected(syncTest);
 
     it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
+      expect(() => {
         getModuleType.sync();
-      }, /^Error: filename missing$/);
+      }).toThrow(new Error('filename missing'));
     });
 
     it('should use an alternative file system if provided', () => {
       const vol = Volume.fromJSON({ 'bar.js': memfsSample }, '/foo');
       const memUfs = ufs.use(vol);
       const type = getModuleType.sync('/foo/bar.js', { fileSystem: memUfs });
-      assert.equal(type, 'commonjs');
+      expect(type).toBe('commonjs');
     });
   });
 
@@ -128,17 +130,17 @@ describe('module-definition', () => {
     testMethodAgainstExpected(sourceTest);
 
     it('should throw an error if argument is missing', () => {
-      assert.throws(() => {
+      expect(() => {
         getModuleType.fromSource();
-      }, /^Error: source not supplied$/);
+      }).toThrow(new Error('source not supplied'));
     });
 
     it('should accept an AST', () => {
-      assert.equal(getModuleType.fromSource(amdAST), 'amd');
+      expect(getModuleType.fromSource(amdAST)).toBe('amd');
     });
 
     it('should deem a main require as commonjs', () => {
-      assert.equal(getModuleType.fromSource('require.main.require();'), 'commonjs');
+      expect(getModuleType.fromSource('require.main.require();')).toBe('commonjs');
     });
   });
 
@@ -149,8 +151,8 @@ describe('module-definition', () => {
         encoding: 'utf8'
       });
 
-      assert.equal(result.status, 1);
-      assert.equal(result.stderr.includes('error: missing required argument \'filename\''), true);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('error: missing required argument \'filename\'');
     });
 
     it('should print the module type for a given file', () => {
@@ -160,8 +162,8 @@ describe('module-definition', () => {
         encoding: 'utf8'
       });
 
-      assert.equal(result.status, 0);
-      assert.equal(result.stdout.trim(), 'commonjs');
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim()).toBe('commonjs');
     });
   });
 });
