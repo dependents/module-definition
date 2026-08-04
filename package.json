@@ -40,10 +40,10 @@
     "node-source-walk": "^8.0.0"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^4.1.7",
-    "memfs": "^4.57.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "memfs": "^4.66.1",
     "unionfs": "^4.6.0",
-    "vitest": "^4.1.7",
+    "vitest": "^4.1.10",
     "xo": "^2.0.2"
   }
 }
